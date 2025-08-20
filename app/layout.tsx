@@ -1,36 +1,35 @@
-// app/layout.tsx
+import type React from "react";
+import { Urbanist } from "next/font/google";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const urbanist = Urbanist({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  fallback: ["system-ui", "arial"],
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
-  title: "Electoral Data Analytics",
-  description: "Secure voter list analysis tool",
+  title: "ECI Data Analytics",
+  description:
+    "AI-powered electoral data analysis that ensures transparency and accuracy in democratic processes.",
 };
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{
+  children: React.ReactNode;  
+}>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
+      <html lang="en" suppressHydrationWarning>
+        <body className={urbanist.className} suppressHydrationWarning>
+          <div className="flex h-screen overflow-hidden">
+            <div className="flex-1 overflow-auto">{children}</div>
+          </div>
         </body>
       </html>
     </ClerkProvider>
