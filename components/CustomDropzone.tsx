@@ -22,7 +22,7 @@ export default function CustomDropzone() {
 
   return (
     <div
-      className={`border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all
+      className={`border-2 border-dashed rounded-2xl p-16 flex flex-col items-center justify-center cursor-pointer transition-all min-h-[400px]
         ${isDragging ? "border-green-500 bg-green-50" : "border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50"}
       `}
       onDragOver={(e) => {
@@ -33,14 +33,14 @@ export default function CustomDropzone() {
       onDrop={handleDrop}
       onClick={() => document.getElementById("fileInput")?.click()}
     >
-      <Upload className="w-10 h-10 text-gray-500 mb-3" />
+      <Upload className="w-20 h-20 text-gray-500 mb-6" />
 
       {isDragging ? (
-        <p className="text-base font-semibold text-green-600">Drop your files here!</p>
+        <p className="text-2xl font-semibold text-green-600">Drop your files here!</p>
       ) : (
         <>
-          <p className="text-lg font-semibold text-gray-700">Upload files</p>
-          <p className="text-sm text-gray-500">Drag & drop or click to select</p>
+          <p className="text-2xl font-semibold text-gray-700">Upload files</p>
+          <p className="text-lg text-gray-500 mt-2">Drag & drop or click to select</p>
         </>
       )}
 
