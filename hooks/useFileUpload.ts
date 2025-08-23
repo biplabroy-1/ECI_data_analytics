@@ -75,84 +75,104 @@ async function uploadAndExtractPDF(file: File): Promise<UploadResponse> {
   const formData = new FormData();
   formData.append("file", file);
 
+  // Increased timeout and better error handling
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 300000); 
+  const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes
 
   try {
     const res = await fetch("/api/extract-pdf", {
       method: "POST",
       body: formData,
       signal: controller.signal,
+      // Add keepalive to prevent connection drops
+      keepalive: true,
     });
 
     clearTimeout(timeoutId);
 
     if (!res.ok) {
-      throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+      const errorText = await res.text().catch(() => 'Unknown error');
+      throw new Error(`Upload failed: ${res.status} ${res.statusText} - ${errorText}`);
     }
 
     return res.json();
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Upload timed out. Please try with a smaller file or check your connection.');
+      throw new Error('Upload timed out after 10 minutes. Please try with a smaller file or check your connection.');
     }
     throw error;
   }
 }
 
-// Analyze extracted data
-async function analyzeData(extractedData: UploadResponse): Promise<AnalysisResponse> {
+// Analyze extracted data with language support
+async function analyzeData(extractedData: UploadResponse, language: string = 'english'): Promise<AnalysisResponse> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 120000);
+  const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
 
   try {
+    const requestBody = {
+      ...extractedData,
+      analysis_language: language, // Add language parameter
+    };
+
     const res = await fetch("http://localhost:5000/api/analyze-json", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json",
       },
-      body: JSON.stringify(extractedData),      
+      body: JSON.stringify(requestBody),      
       signal: controller.signal,
+      keepalive: true,
     });
 
     clearTimeout(timeoutId);
 
     if (!res.ok) {
-      throw new Error(`Analysis failed: ${res.status} ${res.statusText}`);
+      const errorText = await res.text().catch(() => 'Unknown error');
+      throw new Error(`Analysis failed: ${res.status} ${res.statusText} - ${errorText}`);
     }
 
     return res.json();
   } catch (error) {
     clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Analysis timed out. The data is complex and taking longer than expected.');
+      throw new Error('Analysis timed out after 5 minutes. The data is complex and taking longer than expected.');
     }
     throw error;
   }
 }
 
-export function useFileUpload() {
+interface UseFileUploadOptions {
+  language?: string;
+}
+
+export function useFileUpload(options: UseFileUploadOptions = {}) {
   const [currentStep, setCurrentStep] = useState<'idle' | 'uploading' | 'analyzing' | 'complete'>('idle');
   const [progress, setProgress] = useState(0);
 
   const mutation = useMutation({
-    mutationFn: async (file: File): Promise<ProcessedData> => {
+    mutationFn: async ({ file, language = 'english' }: { file: File; language?: string }): Promise<ProcessedData> => {
       try {
+        console.log(`Starting analysis with language: ${language}`);
+        
         // Step 1: Upload and extract PDF
         setCurrentStep('uploading');
-        setProgress(20);
+        setProgress(10);
         
         const uploadData = await uploadAndExtractPDF(file);
         
+        console.log('PDF extraction completed, starting analysis...');
         setProgress(50);
         
-        // Step 2: Analyze extracted data
+        // Step 2: Analyze extracted data with language
         setCurrentStep('analyzing');
-        setProgress(70);
+        setProgress(60);
         
-        const analysisData = await analyzeData(uploadData);
+        const analysisData = await analyzeData(uploadData, language);
         
+        console.log('Analysis completed, generating summary...');
         setProgress(90);
         
         // Step 3: Calculate executive summary
@@ -179,12 +199,15 @@ export function useFileUpload() {
         setProgress(100);
         setCurrentStep('complete');
         
+        console.log('Analysis complete!');
+        
         return {
           uploadData,
           analysisData,
           executiveSummary,
         };
       } catch (error) {
+        console.error('File upload/analysis error:', error);
         setCurrentStep('idle');
         setProgress(0);
         throw error;
@@ -194,9 +217,10 @@ export function useFileUpload() {
       setTimeout(() => {
         setCurrentStep('idle');
         setProgress(0);
-      }, 2000);
+      }, 3000); // Increased display time
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Upload mutation error:', error);
       setCurrentStep('idle');
       setProgress(0);
     },
