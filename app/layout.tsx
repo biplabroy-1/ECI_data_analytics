@@ -1,35 +1,57 @@
-import type React from "react";
-import { Urbanist } from "next/font/google";
+// app/layout.tsx
 import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
-const urbanist = Urbanist({
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: "swap",
-  preload: true,
-  fallback: ["system-ui", "arial"],
-  adjustFontFallback: true,
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "ECI Data Analytics",
-  description:
-    "AI-powered electoral data analysis that ensures transparency and accuracy in democratic processes.",
+  title: "Electoral Data Analytics",
+  description: "Secure voter list analysis tool with AI-powered duplicate detection",
+  keywords: ["electoral", "voter", "analysis", "duplicate", "detection", "AI"],
+  authors: [{ name: "The Future Network LLP" }],
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;  
-}>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={urbanist.className} suppressHydrationWarning>
-          <div className="flex h-screen overflow-hidden">
-            <div className="flex-1 overflow-auto">{children}</div>
-          </div>
+    <ClerkProvider
+      appearance={{
+        elements: {
+          formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
+          card: "shadow-lg",
+          headerTitle: "text-xl font-semibold",
+          headerSubtitle: "text-muted-foreground",
+        },
+        variables: {
+          colorPrimary: "#000000",
+          colorBackground: "#ffffff",
+          colorInputBackground: "#ffffff",
+          colorInputText: "#000000",
+        }
+      }}
+    >
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
         </body>
       </html>
     </ClerkProvider>
