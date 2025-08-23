@@ -1,33 +1,39 @@
-"use client"
+"use client";
 
-import Dropzone, { DropzoneState } from "shadcn-dropzone"
-import { Upload } from "lucide-react"
-import { useMutation } from "@tanstack/react-query"
+import { useState } from "react";
+import Dropzone, { DropzoneState } from "shadcn-dropzone";
+import { Upload } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { useAnalysis } from "./analysisContext";
 
 // File upload API call
 async function uploadFile(file: File) {
-  const formData = new FormData()
-  formData.append("file", file)
+  const formData = new FormData();
+  formData.append("file", file);
 
-  const res = await fetch("/api/xyz", {
+  const res = await fetch("/api/analyze-pdf", {
     method: "POST",
     body: formData,
-  })
+  });
 
-  if (!res.ok) throw new Error("Upload failed")
-  return res.json()
+  if (!res.ok) throw new Error("Upload failed");
+  return res.json();
 }
 
-export const CustomUI = () => {
+export default function CustomDropzone() {
+  const { setAnalysis } = useAnalysis();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const mutation = useMutation({
     mutationFn: uploadFile,
     onSuccess: (data) => {
-      console.log("✅ Upload successful:", data)
+      console.log("✅ Upload successful:", data);
+      setAnalysis(data);
     },
     onError: (err) => {
-      console.error("❌ Upload error:", err)
+      console.error("❌ Upload error:", err);
     },
-  })
+  });
 
   return (
     <Dropzone
@@ -35,7 +41,7 @@ export const CustomUI = () => {
       multiple={false}
       onDrop={(acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
-          mutation.mutate(acceptedFiles[0])
+          setSelectedFile(acceptedFiles[0]);
         }
       }}
     >
@@ -66,15 +72,20 @@ export const CustomUI = () => {
           )}
 
           <div className="text-xs text-gray-400 font-medium mt-3">
-            {dropzone.acceptedFiles.length} file(s) selected
+            {selectedFile ? `1 file selected: ${selectedFile.name}` : "No file selected"}
           </div>
 
+          <button
+            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled={!selectedFile || mutation.isPending}
+            onClick={() => {
+              if (selectedFile) mutation.mutate(selectedFile);
+            }}
+          >
+            {mutation.isPending ? "Uploading..." : "Submit"}
+          </button>
+
           {/* Upload Status */}
-          {mutation.isPending && (
-            <p className="mt-3 text-sm text-blue-500 font-medium">
-              ⏳ Uploading...
-            </p>
-          )}
           {mutation.isSuccess && (
             <p className="mt-3 text-sm text-green-600 font-medium">
               ✅ Upload successful!
@@ -88,5 +99,5 @@ export const CustomUI = () => {
         </div>
       )}
     </Dropzone>
-  )
+  );
 }
