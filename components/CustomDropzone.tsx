@@ -222,6 +222,8 @@ export default function CustomDropzone({ onDataProcessed, selectedLanguage = 'en
           <p className="text-sm text-blue-800">
             🌐 <strong>Analysis Language:</strong> {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
             <br />
+            <span className="text-xs"><span className="font-bold">NOTE:</span> The processing time will depend on the size of PDF and number of pages in it.</span>
+            <br />
             <span className="text-xs">The system will process voter names and data using this language context.</span>
           </p>
         </div>
