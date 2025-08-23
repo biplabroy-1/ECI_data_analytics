@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="glass glass-hover rounded-xl p-4 flex flex-col items-center text-center space-y-6">
           
           {/* Brand Name */}
-          <h3 className="text-2xl font-bold tracking-wide">AZMTH</h3>
+          <h3 className="text-2xl font-bold tracking-wide">azmth</h3>
           
           {/* Tagline */}
           <p className="text-sm text-muted-foreground max-w-md">
@@ -34,7 +34,7 @@ const Footer = () => {
           {/* Copyright */}
           <div className=" border-t border-white/10 w-full">
             <p className="text-xs text-muted-foreground text-center">
-              © 2025 The Future Network LLP. All rights reserved.
+              © 2025 The Future Network LLP.
             </p>
           </div>
         </div>
