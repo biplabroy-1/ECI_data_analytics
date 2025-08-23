@@ -80,7 +80,7 @@ async function uploadAndExtractPDF(file: File): Promise<UploadResponse> {
   const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes
 
   try {
-    const res = await fetch("/api/extract-pdf", {
+    const res = await fetch("/api/analyse-pdf", {
       method: "POST",
       body: formData,
       signal: controller.signal,
