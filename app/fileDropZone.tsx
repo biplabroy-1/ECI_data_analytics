@@ -11,7 +11,7 @@ async function uploadFile(file: File) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch("/api/analyze-pdf", {
+  const res = await fetch("http://eci-backend.azmth.in/api/analyze-pdf", {
     method: "POST",
     body: formData,
   });
@@ -72,7 +72,9 @@ export default function CustomDropzone() {
           )}
 
           <div className="text-xs text-gray-400 font-medium mt-3">
-            {selectedFile ? `1 file selected: ${selectedFile.name}` : "No file selected"}
+            {selectedFile
+              ? `1 file selected: ${selectedFile.name}`
+              : "No file selected"}
           </div>
 
           <button
