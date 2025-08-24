@@ -1,6 +1,5 @@
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -18,8 +17,7 @@ export const metadata: Metadata = {
   title: "Electoral Data Analytics",
   description: "Secure voter list analysis tool with AI-powered duplicate detection",
   keywords: ["electoral", "voter", "analysis", "duplicate", "detection", "AI"],
-  authors: [{ name: "The Future Network LLP" }],
-  viewport: "width=device-width, initial-scale=1",
+  authors: [{ name: "The Future Network LLP" }]
 };
 
 export default function RootLayout({
