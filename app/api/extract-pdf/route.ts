@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
 
     try {
-      const response = await fetch('http://localhost:5000/api/analyze-pdf', {
+      const response = await fetch('http://eci-backend.azmth.in/api/analyze-pdf', {
         method: 'POST',
         body: backendFormData,
         signal: controller.signal,
@@ -79,7 +79,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// Increase the timeout for this API route
-export const maxDuration = 900; // 15 minutes
-export const dynamic = 'force-dynamic';
